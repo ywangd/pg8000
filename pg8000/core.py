@@ -1344,7 +1344,7 @@ class Connection(object):
         #               0 = AuthenticationOk
         #               5 = MD5 pwd
         #               2 = Kerberos v5 (not supported by pg8000)
-        #               3 = Cleartext pwd (not supported by pg8000)
+        #               3 = Cleartext pwd 
         #               4 = crypt() pwd (not supported by pg8000)
         #               6 = SCM credential (not supported by pg8000)
         #               7 = GSSAPI (not supported by pg8000)
@@ -1380,12 +1380,16 @@ class Connection(object):
             self._send_message(PASSWORD, pwd + NULL_BYTE)
             self._flush()
 
-        elif auth_code in (2, 3, 4, 6, 7, 8, 9):
+        elif auth_code == 3:
+            self._send_message(PASSWORD, self.password)
+            self._flush()
+
+        elif auth_code in (2, 4, 6, 7, 8, 9):
             raise NotSupportedError(
-                "authentication method " + auth_code + " not supported")
+                "authentication method " + str(auth_code) + " not supported")
         else:
             raise InternalError(
-                "Authentication method " + auth_code + " not recognized")
+                "Authentication method " + str(auth_code) + " not recognized")
 
     def handle_READY_FOR_QUERY(self, data, ps):
         # Byte1 -   Status indicator.
