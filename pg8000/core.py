@@ -1381,6 +1381,10 @@ class Connection(object):
             self._flush()
 
         elif auth_code == 3:
+            if self.password is None:
+                raise InterfaceError(
+                    "server requesting cleartext password authentication, but no "
+                    "password was provided")
             self._send_message(PASSWORD, self.password)
             self._flush()
 
